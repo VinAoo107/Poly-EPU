@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Contributing Markets | Poly-EPU Index</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+    /* ── Volume tag in market cell ─────────────────────────────────── */
+    .market-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+    }
+    .volume-label {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #8b949e;
+        background: rgba(139,148,158,0.1);
+        border: 1px solid rgba(139,148,158,0.2);
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+    .volume-amount {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #c9d1d9;
+    }
+
+    /* ── Flatpickr dark overrides ──────────────────────────────────── */
+    .flatpickr-calendar {
+        background: #1a1a2e !important;
+        border: 1px solid #2a2a4a !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+    }
+    .flatpickr-months,
+    .flatpickr-weekdays,
+    span.flatpickr-weekday {
+        background: #1a1a2e !important;
+        color: #a0a0a0 !important;
+    }
+    .flatpickr-day { color: #e0e0e0 !important; }
+    .flatpickr-day:hover,
+    .flatpickr-day.selected {
+        background: #00d4ff !important;
+        border-color: #00d4ff !important;
+        color: #0a0a1e !important;
+    }
+    .flatpickr-day.flatpickr-disabled,
+    .flatpickr-day.flatpickr-disabled:hover { color: #444 !important; }
+    .flatpickr-prev-month,
+    .flatpickr-next-month { fill: #a0a0a0 !important; color: #a0a0a0 !important; }
+    .flatpickr-current-month input.cur-year,
+    .flatpickr-current-month .numInputWrapper,
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+        color: #e0e0e0 !important;
+        background: transparent !important;
+    }
+    .flatpickr-monthDropdown-months option { background: #1a1a2e !important; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M7 14l4-4 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="logo-text">Poly-EPU</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html"       class="nav-link" data-page="index">Dashboard</a>
+                <a href="markets.html"     class="nav-link" data-page="markets">Top Markets</a>
+                <a href="methodology.html" class="nav-link" data-page="methodology">Methodology</a>
+                <a href="about.html"       class="nav-link" data-page="about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="markets-page">
+            <!-- Header -->
+            <div class="page-header">
+                <div class="header-content">
+                    <h1 class="page-title">Top Contributing Markets</h1>
+                    <p class="page-subtitle">Markets with the highest contribution to the daily EPU index</p>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-section">
+                <div class="control-row">
+                    <div class="control-group">
+                        <label class="control-label">Select Date</label>
+                        <div style="position:relative; display:inline-flex; align-items:center;">
+                            <input type="text" id="marketDate" class="date-input"
+                                   placeholder="Click to pick a date" readonly
+                                   style="cursor:pointer; padding-right:36px; min-width:160px;">
+                            <svg style="position:absolute;right:10px;pointer-events:none;color:#a0a0a0;"
+                                 width="16" height="16" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8"  y1="2" x2="8"  y2="6"/>
+                                <line x1="3"  y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Number of Markets</label>
+                        <select id="marketLimit" class="select-control" onchange="loadTopMarkets()">
+                            <option value="5" selected>Top 5</option>
+                            <option value="10">Top 10</option>
+                            <option value="20">Top 20</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-section" id="summarySection" style="display: none;">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="9" y1="21" x2="9" y2="9"></line>
+                            </svg>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-value" id="summaryDate">--</div>
+                            <div class="summary-label">Selected Date</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-value" id="summaryTotalMarkets">--</div>
+                            <div class="summary-label">Total Markets</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-value" id="summaryVolume">--</div>
+                            <div class="summary-label">Total Volume</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Markets Table -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h2 class="section-title">Market Contributions</h2>
+                    <div class="table-info" id="tableInfo"></div>
+                </div>
+
+                <div class="table-container">
+                    <table id="marketsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Market</th>
+                                <th>Probability</th>
+                                <th>Entropy</th>
+                                <th>Volatility</th>
+                                <th>Score</th>
+                                <th>Weight</th>
+                                <th>Contribution</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marketsBody">
+                            <tr class="loading-row">
+                                <td colspan="9">
+                                    <div class="loading-message">
+                                        <div class="spinner"></div>
+                                        <span>Loading market data...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Explanation Section -->
+            <div class="explanation-section">
+                <h3 class="section-subtitle">How Market Contribution is Calculated</h3>
+                <div class="explanation-grid">
+                    <div class="explanation-card">
+                        <h4>Entropy</h4>
+                        <p>Information entropy measures uncertainty in market outcomes. When price ≈ 0.5, entropy is maximum (highest uncertainty).</p>
+                        <code>Entropy = -P×log₂(P) - (1-P)×log₂(1-P)</code>
+                    </div>
+                    <div class="explanation-card">
+                        <h4>Volatility</h4>
+                        <p>Price volatility calculated using EWMA (Exponentially Weighted Moving Average) with decay factor λ = 0.94.</p>
+                        <code>Vol_t = λ×Vol_{t-1} + (1-λ)×|ΔP_t|</code>
+                    </div>
+                    <div class="explanation-card">
+                        <h4>Market Score</h4>
+                        <p>Combined measure of static (entropy) and dynamic (volatility) uncertainty with equal weights (α = 0.5).</p>
+                        <code>Score = α×Entropy + (1-α)×Volatility</code>
+                    </div>
+                    <div class="explanation-card">
+                        <h4>Contribution</h4>
+                        <p>Market's contribution to daily EPU is its score weighted by trading volume proportion.</p>
+                        <code>Contribution = Score × (Volume / TotalVolume)</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <p>Poly-EPU Index - Economic Policy Uncertainty from Prediction Markets</p>
+                <p class="footer-meta">Data source: <a href="https://polymarket.com" target="_blank">Polymarket</a></p>
+            </div>
+            <div class="footer-links">
+                <a href="methodology.html">Methodology</a>
+                <a href="about.html">About This Research</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+    <script>
+    // ── Active nav highlight ───────────────────────────────────────────────
+    (function () {
+        const path = window.location.pathname;
+        const page = path.includes('markets') ? 'markets'
+                   : path.includes('methodology') ? 'methodology'
+                   : path.includes('about') ? 'about'
+                   : 'index';
+        document.querySelectorAll('.nav-link').forEach(a => {
+            if (a.dataset.page === page) a.classList.add('active');
+        });
+    })();
+
+    // ── Constants ──────────────────────────────────────────────────────────
+    const MARKET_DATA_START = '2022-11-18';
+    const MARKET_DATA_END   = '2025-06-19';
+
+    // Loaded once from markets_cache.json: { daily: { "YYYY-MM-DD": {...} } }
+    let _marketsCache = null;
+    let _marketsDates = [];  // sorted list of available date strings
+
+    // ── Read ?date= from URL ───────────────────────────────────────────────
+    function getUrlDate() {
+        const params = new URLSearchParams(window.location.search);
+        const d = params.get('date');
+        if (d && d >= MARKET_DATA_START && d <= MARKET_DATA_END) return d;
+        return MARKET_DATA_END;
+    }
+
+    // ── Find nearest available date in cache ───────────────────────────────
+    function nearestCacheDate(requested) {
+        if (!_marketsDates.length) return null;
+        if (_marketsCache[requested]) return requested;
+
+        // Latest date <= requested
+        const before = _marketsDates.filter(d => d <= requested);
+        if (before.length) return before[before.length - 1];
+
+        // Earliest date > requested
+        const after = _marketsDates.filter(d => d > requested);
+        if (after.length) return after[0];
+
+        return null;
+    }
+
+    // ── Initialise: load cache JSON, then set up flatpickr ─────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        const initialDate = getUrlDate();
+
+        // Initialise flatpickr first (with loading state in the table)
+        flatpickr('#marketDate', {
+            dateFormat:  'Y-m-d',
+            defaultDate: initialDate,
+            minDate:     MARKET_DATA_START,
+            maxDate:     MARKET_DATA_END,
+            onChange: function (selectedDates, dateStr) {
+                if (dateStr) loadTopMarkets();
+            }
+        });
+
+        // Load markets cache, then trigger first render
+        fetch('markets_cache.json')
+            .then(r => r.json())
+            .then(data => {
+                _marketsCache = data.daily || {};
+                _marketsDates = Object.keys(_marketsCache).sort();
+                loadTopMarkets();
+            })
+            .catch(err => {
+                console.error('Failed to load markets_cache.json:', err);
+                showError('Could not load market data file.');
+            });
+    });
+
+    // ── Load top markets for selected date ────────────────────────────────
+    function loadTopMarkets() {
+        const date  = document.getElementById('marketDate').value;
+        const limit = parseInt(document.getElementById('marketLimit').value, 10) || 5;
+
+        if (!date) return;
+
+        // Show loading
+        document.getElementById('marketsBody').innerHTML = `
+            <tr class="loading-row">
+                <td colspan="9">
+                    <div class="loading-message">
+                        <div class="spinner"></div>
+                        <span>Loading market data...</span>
+                    </div>
+                </td>
+            </tr>`;
+
+        // If cache not yet loaded, wait (flatpickr onChange can fire before fetch finishes)
+        if (!_marketsCache) return;
+
+        const cacheDate = nearestCacheDate(date);
+        if (!cacheDate || !_marketsCache[cacheDate]) {
+            showError('No data available for selected date.');
+            return;
+        }
+
+        const dayData = _marketsCache[cacheDate];
+        const markets = (dayData.markets || []).slice(0, limit).map((m, i) =>
+            Object.assign({}, m, { rank: i + 1 })
+        );
+
+        displayMarkets({
+            date:          cacheDate,
+            total_markets: dayData.total_markets || markets.length,
+            total_volume:  dayData.total_volume  || 0,
+            markets:       markets
+        });
+    }
+
+    // ── Render markets into table ─────────────────────────────────────────
+    function displayMarkets(data) {
+        document.getElementById('summarySection').style.display = 'block';
+        document.getElementById('summaryDate').textContent          = formatDate(data.date);
+        document.getElementById('summaryTotalMarkets').textContent  = data.total_markets;
+        document.getElementById('summaryVolume').textContent        = '$' + formatNumber(data.total_volume);
+
+        const tbody = document.getElementById('marketsBody');
+
+        if (!data.markets || data.markets.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" class="no-data">No markets found for this date</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        data.markets.forEach((market, index) => {
+            html += `
+                <tr>
+                    <td class="rank">${index + 1}</td>
+                    <td class="market-cell">
+                        <div class="market-title">${escapeHtml(market.question)}</div>
+                        <div class="market-meta">
+                            <span class="volume-label">Volume</span>
+                            <span class="volume-amount">$${formatNumber(market.volume)}</span>
+                        </div>
+                    </td>
+                    <td class="price-cell">
+                        <div class="price-value">${(market.price * 100).toFixed(1)}%</div>
+                        <div class="price-bar">
+                            <div class="price-fill" style="width: ${market.price * 100}%"></div>
+                        </div>
+                    </td>
+                    <td class="metric-cell">${market.entropy.toFixed(4)}</td>
+                    <td class="metric-cell">${market.volatility.toFixed(4)}</td>
+                    <td class="metric-cell highlight">${market.market_score.toFixed(4)}</td>
+                    <td class="metric-cell">${(market.weight * 100).toFixed(2)}%</td>
+                    <td class="contribution-cell">
+                        <span class="contribution-value">${market.contribution.toFixed(6)}</span>
+                        <div class="contribution-bar">
+                            <div class="contribution-fill" style="width: ${Math.min(market.contribution * 1000, 100)}%"></div>
+                        </div>
+                    </td>
+                    <td class="actions-cell">
+                        ${market.url ? `
+                        <a href="${market.url}" target="_blank" class="btn-icon" title="View on Polymarket">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                        </a>` : ''}
+                    </td>
+                </tr>`;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById('tableInfo').textContent =
+            `Showing top ${data.markets.length} of ${data.total_markets} markets`;
+    }
+
+    function showError(message) {
+        document.getElementById('marketsBody').innerHTML =
+            `<tr><td colspan="9" class="error-message">${message}</td></tr>`;
+    }
+
+    // ── Utilities ──────────────────────────────────────────────────────────
+    function formatNumber(num) {
+        if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+        if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+        if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+        return num.toFixed(2);
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr + 'T00:00:00');
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    </script>
+</body>
+</html>

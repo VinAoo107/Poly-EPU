@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Poly-EPU Index</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M7 14l4-4 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="logo-text">Poly-EPU</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html"       class="nav-link" data-page="index">Dashboard</a>
+                <a href="markets.html"     class="nav-link" data-page="markets">Top Markets</a>
+                <a href="methodology.html" class="nav-link" data-page="methodology">Methodology</a>
+                <a href="about.html"       class="nav-link" data-page="about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="about-page">
+            <div class="page-header">
+                <h1 class="page-title">About This Research</h1>
+                <p class="page-subtitle">Information Aggregation in Prediction Markets: A Risk Monitoring Framework for Economic Policy Uncertainty</p>
+            </div>
+
+            <div class="content-sections">
+                <!-- Abstract Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Abstract</h2>
+                    <div class="section-content">
+                        <div class="abstract-box">
+                            <p>
+                                Effectively monitoring Economic Policy Uncertainty (EPU) is crucial for early risk sensing;
+                                however, traditional EPU indices, primarily news-based, are often limited by reporting latency
+                                and subjective bias. To address these limitations, this paper proposes Poly-EPU, a high-frequency
+                                monitoring framework that utilizes Polymarket transaction data to capture forward-looking crowd
+                                wisdom for uncertainty sensing.
+                            </p>
+                            <p>
+                                Specifically, this framework first screens EPU-related markets by applying Large Language Model (LLM),
+                                then constructs the Poly-EPU index by information derived from market prices. Empirical results
+                                demonstrate that Poly-EPU: (1) accurately detects major risk events, validating its real-time
+                                sensing capabilities; (2) correlates significantly with traditional EPU indices, confirming its
+                                validity as a macro-information proxy; (3) exhibits long-term cointegration with the VIX, and
+                                reveals significant spillover effects that serve as robust early-warning signals.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Key Contributions Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Key Contributions</h2>
+                    <div class="section-content">
+                        <div class="contributions-grid">
+                            <div class="contribution-card">
+                                <div class="contribution-number">1</div>
+                                <h4>Innovative Data Source</h4>
+                                <p>
+                                    Leverages prediction markets as a novel data source for EPU measurement,
+                                    overcoming frequency and incentive constraints of traditional text analysis.
+                                    Employs LLM for targeted market screening.
+                                </p>
+                            </div>
+                            <div class="contribution-card">
+                                <div class="contribution-number">2</div>
+                                <h4>Novel Index Methodology</h4>
+                                <p>
+                                    Proposes an index synthesis algorithm integrating static uncertainty
+                                    (information entropy) and dynamic uncertainty (price volatility) with
+                                    volume-weighted aggregation.
+                                </p>
+                            </div>
+                            <div class="contribution-card">
+                                <div class="contribution-number">3</div>
+                                <h4>Validated Effectiveness</h4>
+                                <p>
+                                    Systematically evaluates validity through ARDL modeling, demonstrating
+                                    significant long-term positive spillover effect on VIX with robust
+                                    leading predictive capacity.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Source Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Data Source</h2>
+                    <div class="section-content">
+                        <div class="data-source-info">
+                            <div class="source-logo">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <div class="source-details">
+                                <h4>Polymarket</h4>
+                                <p>
+                                    Polymarket is the world's leading decentralized prediction market platform,
+                                    utilizing blockchain technology to enable 24/7 trading on the likelihood of
+                                    various political, economic, and regulatory events.
+                                </p>
+                                <a href="https://polymarket.com" target="_blank" class="btn btn-outline">
+                                    Visit Polymarket
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="data-stats">
+                            <div class="data-stat">
+                                <div class="data-stat-value">5,787+</div>
+                                <div class="data-stat-label">EPU-Related Markets</div>
+                            </div>
+                            <div class="data-stat">
+                                <div class="data-stat-value">Feb 2024 - Present</div>
+                                <div class="data-stat-label">Data Coverage Period</div>
+                            </div>
+                            <div class="data-stat">
+                                <div class="data-stat-value">Daily</div>
+                                <div class="data-stat-label">Update Frequency</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- How to Use Section -->
+                <section class="content-section">
+                    <h2 class="section-title">How to Use This Website</h2>
+                    <div class="section-content">
+                        <div class="usage-guide">
+                            <div class="usage-item">
+                                <div class="usage-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                                    </svg>
+                                </div>
+                                <div class="usage-content">
+                                    <h4>Dashboard</h4>
+                                    <p>View the Poly-EPU index trend over time with interactive charts.
+                                       Switch between daily, weekly, and monthly views. Hover over data points
+                                       for detailed information including the number of contributing markets
+                                       and total trading volume.</p>
+                                </div>
+                            </div>
+
+                            <div class="usage-item">
+                                <div class="usage-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                    </svg>
+                                </div>
+                                <div class="usage-content">
+                                    <h4>Top Markets</h4>
+                                    <p>Explore which prediction markets contributed most to the EPU index
+                                       on any given date. View detailed metrics including entropy, volatility,
+                                       market score, and weighted contribution for each market.</p>
+                                </div>
+                            </div>
+
+                            <div class="usage-item">
+                                <div class="usage-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="usage-content">
+                                    <h4>Methodology</h4>
+                                    <p>Read the full technical description of how the Poly-EPU index is
+                                       constructed, including the formulas for entropy, EWMA volatility,
+                                       and volume-weighted aggregation.</p>
+                                </div>
+                            </div>
+
+                            <div class="usage-item">
+                                <div class="usage-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                </div>
+                                <div class="usage-content">
+                                    <h4>Export Data</h4>
+                                    <p>Use the Download button in the chart toolbar to export the EPU index
+                                       data as PNG or SVG for use in your own research or presentations.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Contact Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Research Context</h2>
+                    <div class="section-content">
+                        <div class="research-info">
+                            <p>
+                                This data query system is provided as supplementary material for the research paper
+                                <em>"Information Aggregation in Prediction Markets: A Risk Monitoring Framework for
+                                Economic Policy Uncertainty"</em>. It allows reviewers and researchers to interactively
+                                explore the Poly-EPU index data and verify the empirical findings presented in the paper.
+                            </p>
+                            <p>
+                                For questions about the methodology or data, please refer to the
+                                <a href="methodology.html">Methodology</a> page or contact the authors
+                                through the journal's review system.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <p>Poly-EPU Index - Economic Policy Uncertainty from Prediction Markets</p>
+                <p class="footer-meta">Data source: <a href="https://polymarket.com" target="_blank">Polymarket</a></p>
+            </div>
+            <div class="footer-links">
+                <a href="methodology.html">Methodology</a>
+                <a href="about.html">About This Research</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+    <script>
+    // Active nav highlight
+    (function () {
+        const path = window.location.pathname;
+        const page = path.includes('markets') ? 'markets'
+                   : path.includes('methodology') ? 'methodology'
+                   : path.includes('about') ? 'about'
+                   : 'index';
+        document.querySelectorAll('.nav-link').forEach(a => {
+            if (a.dataset.page === page) a.classList.add('active');
+        });
+    })();
+    </script>
+</body>
+</html>

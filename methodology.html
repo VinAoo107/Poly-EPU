@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methodology | Poly-EPU Index</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M7 14l4-4 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="logo-text">Poly-EPU</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html"       class="nav-link" data-page="index">Dashboard</a>
+                <a href="markets.html"     class="nav-link" data-page="markets">Top Markets</a>
+                <a href="methodology.html" class="nav-link" data-page="methodology">Methodology</a>
+                <a href="about.html"       class="nav-link" data-page="about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="methodology-page">
+            <div class="page-header">
+                <h1 class="page-title">Poly-EPU Methodology</h1>
+                <p class="page-subtitle">Understanding how the Economic Policy Uncertainty Index is constructed from prediction market data</p>
+            </div>
+
+            <div class="content-sections">
+                <!-- Overview Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Overview</h2>
+                    <div class="section-content">
+                        <p>
+                            The Poly-EPU index is a novel Economic Policy Uncertainty (EPU) measurement framework that leverages
+                            transaction data from Polymarket, the world's leading decentralized prediction market platform.
+                            Unlike traditional EPU indices that rely on news text analysis (BBD-EPU), Poly-EPU captures
+                            forward-looking crowd wisdom through real capital-at-stake market transactions.
+                        </p>
+                        <div class="highlight-box">
+                            <h4>Key Advantages</h4>
+                            <ul>
+                                <li><strong>High Frequency:</strong> Daily updates compared to monthly traditional indices</li>
+                                <li><strong>Forward-Looking:</strong> Captures market expectations, not historical events</li>
+                                <li><strong>Capital-Verified:</strong> Traders risk real money, filtering noise and bias</li>
+                                <li><strong>Real-Time:</strong> Immediate response to policy events and announcements</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Market Selection Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Market Selection</h2>
+                    <div class="section-content">
+                        <p>
+                            Markets are screened for EPU relevance using an LLM-based filtering system that evaluates
+                            market titles and descriptions against the 11 policy categories defined by Baker, Bloom,
+                            and Davis (2016), supplemented with policymaker changes.
+                        </p>
+
+                        <div class="category-grid">
+                            <div class="category-card">
+                                <h4>Monetary Policy</h4>
+                                <p>Fed decisions, interest rates, inflation, Powell statements</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Fiscal Policy</h4>
+                                <p>Budget, debt ceiling, government spending, infrastructure</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Trade Policy</h4>
+                                <p>Tariffs, trade agreements, WTO, sanctions</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Taxes</h4>
+                                <p>Tax reform, corporate tax, IRS policies</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Health Care</h4>
+                                <p>Medicaid, FDA regulations, healthcare reform</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>National Security</h4>
+                                <p>Defense spending, military actions, geopolitics</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Financial Regulation</h4>
+                                <p>SEC/CFTC decisions, banking supervision, crypto</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Regulation (General)</h4>
+                                <p>Antitrust, immigration, EPA, labor laws</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Entitlements</h4>
+                                <p>Social Security, unemployment, welfare programs</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Sovereign Debt</h4>
+                                <p>Default risk, currency stability, debt markets</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Elections</h4>
+                                <p>Presidential, congressional, gubernatorial races</p>
+                            </div>
+                            <div class="category-card">
+                                <h4>Policymakers</h4>
+                                <p>Fed Chair nominations, cabinet appointments</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Calculation Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Index Calculation</h2>
+                    <div class="section-content">
+                        <p>The Poly-EPU index combines two dimensions of uncertainty:</p>
+
+                        <div class="formula-cards">
+                            <div class="formula-card">
+                                <h4>1. Static Uncertainty (Information Entropy)</h4>
+                                <p>Measures the equilibrium degree of probability distribution:</p>
+                                <div class="formula">
+                                    <code>Entropy<sub>i,t</sub> = -P<sub>i,t</sub>·log₂(P<sub>i,t</sub>) - (1-P<sub>i,t</sub>)·log₂(1-P<sub>i,t</sub>)</code>
+                                </div>
+                                <p class="formula-note">
+                                    When P = 0.5, entropy reaches maximum (=1), indicating highest uncertainty.
+                                    When P approaches 0 or 1, entropy approaches 0 (certainty).
+                                </p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h4>2. Dynamic Uncertainty (EWMA Volatility)</h4>
+                                <p>Captures abrupt changes in market beliefs:</p>
+                                <div class="formula">
+                                    <code>Volatility<sub>i,t</sub> = λ·Volatility<sub>i,t-1</sub> + (1-λ)·|ΔP<sub>i,t</sub>|</code>
+                                </div>
+                                <p class="formula-note">
+                                    λ = 0.94 (RiskMetrics standard decay factor)<br>
+                                    |ΔP<sub>i,t</sub>| = |P<sub>i,t</sub> - P<sub>i,t-1</sub>| (absolute daily price change)
+                                </p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h4>3. Market Score</h4>
+                                <p>Combines static and dynamic uncertainty:</p>
+                                <div class="formula">
+                                    <code>MarketScore<sub>i,t</sub> = α·Entropy<sub>i,t</sub> + (1-α)·Volatility<sub>i,t</sub></code>
+                                </div>
+                                <p class="formula-note">α = 0.5 (equal weight to both dimensions)</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h4>4. Volume-Weighted Aggregation</h4>
+                                <p>Final index weighted by trading volume:</p>
+                                <div class="formula">
+                                    <code>Weight<sub>i,t</sub> = Volume<sub>i,t</sub> / Σ<sub>j∈S<sub>t</sub></sub>Volume<sub>j,t</sub></code>
+                                </div>
+                                <div class="formula">
+                                    <code>Poly-EPU<sub>t</sub> = Σ<sub>i∈S<sub>t</sub></sub> Weight<sub>i,t</sub>·MarketScore<sub>i,t</sub></code>
+                                </div>
+                                <p class="formula-note">
+                                    Higher-volume markets receive greater weight, reflecting more aggregated information.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Validation Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Validation</h2>
+                    <div class="section-content">
+                        <p>The Poly-EPU index has been validated through multiple empirical tests:</p>
+
+                        <div class="validation-grid">
+                            <div class="validation-card">
+                                <div class="validation-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Event Detection</h4>
+                                    <p>Accurately captures major policy events including U.S. presidential elections,
+                                       Fed policy reviews, and geopolitical conflicts.</p>
+                                </div>
+                            </div>
+
+                            <div class="validation-card">
+                                <div class="validation-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                                        <line x1="6"  y1="20" x2="6"  y2="14"></line>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>BBD-EPU Correlation</h4>
+                                    <p>Monthly correlation coefficient of <strong>0.8782</strong> with the benchmark
+                                       BBD-EPU index (p &lt; 0.001), confirming validity as a macro information proxy.</p>
+                                </div>
+                            </div>
+
+                            <div class="validation-card">
+                                <div class="validation-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 3v18h18"></path>
+                                        <path d="M18 17l-5-5-4 4-3-3"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>VIX Spillover</h4>
+                                    <p>Exhibits significant long-term cointegration with VIX. ARDL model shows
+                                       positive spillover effect with ~8.5 day absorption half-life.</p>
+                                </div>
+                            </div>
+
+                            <div class="validation-card">
+                                <div class="validation-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Leading Indicator</h4>
+                                    <p>Demonstrates predictive power for market volatility, providing an early
+                                       warning window for policy-induced market movements.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Parameters Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Model Parameters</h2>
+                    <div class="section-content">
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Symbol</th>
+                                    <th>Value</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>EWMA Decay Factor</td>
+                                    <td>λ</td>
+                                    <td>0.94</td>
+                                    <td>RiskMetrics standard for daily financial data</td>
+                                </tr>
+                                <tr>
+                                    <td>Entropy-Volatility Weight</td>
+                                    <td>α</td>
+                                    <td>0.50</td>
+                                    <td>Equal weight to static and dynamic uncertainty</td>
+                                </tr>
+                                <tr>
+                                    <td>Price Data Frequency</td>
+                                    <td>fidelity</td>
+                                    <td>1440</td>
+                                    <td>Daily price observations (1440 minutes)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- References Section -->
+                <section class="content-section">
+                    <h2 class="section-title">Key References</h2>
+                    <div class="section-content">
+                        <ul class="reference-list">
+                            <li>Baker, S. R., Bloom, N., &amp; Davis, S. J. (2016). Measuring Economic Policy Uncertainty.
+                                <em>The Quarterly Journal of Economics</em>, 131(4), 1593-1636.</li>
+                            <li>Wolfers, J., &amp; Zitzewitz, E. (2004). Prediction Markets.
+                                <em>Journal of Economic Perspectives</em>, 18(2), 107-126.</li>
+                            <li>Pástor, L., &amp; Veronesi, P. (2012). Uncertainty about Government Policy and Stock Prices.
+                                <em>The Journal of Finance</em>, 67(4), 1219-1264.</li>
+                            <li>J.P. Morgan (1996). RiskMetrics Technical Document (Fourth Edition).</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <p>Poly-EPU Index - Economic Policy Uncertainty from Prediction Markets</p>
+                <p class="footer-meta">Data source: <a href="https://polymarket.com" target="_blank">Polymarket</a></p>
+            </div>
+            <div class="footer-links">
+                <a href="methodology.html">Methodology</a>
+                <a href="about.html">About This Research</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+    <script>
+    // Active nav highlight
+    (function () {
+        const path = window.location.pathname;
+        const page = path.includes('markets') ? 'markets'
+                   : path.includes('methodology') ? 'methodology'
+                   : path.includes('about') ? 'about'
+                   : 'index';
+        document.querySelectorAll('.nav-link').forEach(a => {
+            if (a.dataset.page === page) a.classList.add('active');
+        });
+    })();
+    </script>
+</body>
+</html>

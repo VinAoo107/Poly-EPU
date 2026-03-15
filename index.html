@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Poly-EPU Index</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+
+    <!-- PapaParse (CSV parser) -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5/papaparse.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+    /* ── Flatpickr overrides for dark theme ───────────────────────── */
+    .flatpickr-calendar {
+        background: #1a1a2e !important;
+        border: 1px solid #2a2a4a !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+    }
+    .flatpickr-months,
+    .flatpickr-weekdays,
+    span.flatpickr-weekday {
+        background: #1a1a2e !important;
+        color: #a0a0a0 !important;
+    }
+    .flatpickr-day { color: #e0e0e0 !important; }
+    .flatpickr-day:hover,
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange {
+        background: #00d4ff !important;
+        border-color: #00d4ff !important;
+        color: #0a0a1e !important;
+    }
+    .flatpickr-day.inRange {
+        background: rgba(0,212,255,0.2) !important;
+        border-color: transparent !important;
+        color: #e0e0e0 !important;
+        box-shadow: none !important;
+    }
+    .flatpickr-day.flatpickr-disabled,
+    .flatpickr-day.flatpickr-disabled:hover { color: #444 !important; }
+    .flatpickr-prev-month,
+    .flatpickr-next-month { fill: #a0a0a0 !important; color: #a0a0a0 !important; }
+    .flatpickr-current-month input.cur-year,
+    .flatpickr-current-month .numInputWrapper,
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+        color: #e0e0e0 !important;
+        background: transparent !important;
+    }
+    .flatpickr-monthDropdown-months option { background: #1a1a2e !important; }
+
+    /* ── Split date inputs (start / to / end) ────────────────────── */
+    .date-inputs-split {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .date-split-input {
+        background: var(--bg-input, #0d1117);
+        border: 1px solid var(--border-primary, #30363d);
+        border-radius: 8px;
+        color: var(--text-primary, #e6edf3);
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        width: 120px;
+        cursor: pointer;
+        outline: none;
+        text-align: center;
+        transition: border-color 0.15s;
+    }
+    .date-split-input:focus,
+    .date-split-input:hover { border-color: #00d4ff; }
+    .date-split-sep {
+        color: var(--text-muted, #6e7681);
+        font-size: 0.85rem;
+        user-select: none;
+    }
+    .date-reset-btn {
+        background: none;
+        border: 1px solid var(--border-primary, #30363d);
+        border-radius: 6px;
+        color: var(--text-secondary, #8b949e);
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .date-reset-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+
+    /* ── Chart nav (left/right range) ───────────────────────────── */
+    .chart-nav-wrapper {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        min-height: 450px;
+        position: relative;
+    }
+    .chart-nav-btn {
+        flex-shrink: 0;
+        width: 28px;
+        background: var(--bg-secondary, #161b22);
+        border: 1px solid var(--border-primary, #30363d);
+        color: var(--text-secondary, #8b949e);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .chart-nav-btn.visible {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .chart-nav-btn:hover {
+        background: var(--accent-blue-dim, rgba(0,212,255,0.15));
+        color: var(--accent-blue, #00d4ff);
+        border-color: var(--accent-blue, #00d4ff);
+    }
+    .chart-nav-btn:focus { outline: none; }
+    .chart-nav-left  { border-radius: 8px 0 0 8px; border-right-width: 0; }
+    .chart-nav-right { border-radius: 0 8px 8px 0; border-left-width:  0; }
+    .chart-inner { flex: 1; min-width: 0; }
+
+    /* ── ApexCharts toolbar ─────────────────────────────────────── */
+    .apexcharts-toolbar { gap: 10px !important; }
+    .apexcharts-toolbar > div { margin: 0 !important; }
+    .apexcharts-zoom-icon,
+    .apexcharts-reset-icon { display: none !important; }
+    .apexcharts-download-icon svg {
+        fill: #8b949e !important;
+        transition: fill 0.15s !important;
+    }
+    .apexcharts-download-icon:hover svg { fill: #00d4ff !important; }
+
+    /* ── ApexCharts download menu ───────────────────────────────── */
+    .apexcharts-menu {
+        background: #1c2128 !important;
+        border: 1px solid #30363d !important;
+        border-radius: 8px !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+        overflow: hidden !important;
+    }
+    .apexcharts-menu-item {
+        color: #c9d1d9 !important;
+        font-weight: 500 !important;
+        font-size: 0.85rem !important;
+        padding: 8px 16px !important;
+        transition: background 0.15s !important;
+    }
+    .apexcharts-menu-item:hover {
+        background: rgba(0,212,255,0.12) !important;
+        color: #00d4ff !important;
+    }
+
+    /* ── Recent table: Top Markets column — header + icon centred ── */
+    #recentDataTable th:last-child,
+    #recentDataTable td:last-child { text-align: center; }
+    .top-markets-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid var(--border-primary, #30363d);
+        background: transparent;
+        color: var(--text-secondary, #8b949e);
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .top-markets-link:hover {
+        border-color: var(--accent-blue, #00d4ff);
+        color: var(--accent-blue, #00d4ff);
+        background: var(--accent-blue-dim, rgba(0,212,255,0.15));
+    }
+    .top-markets-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M7 14l4-4 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="logo-text">Poly-EPU</span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html"       class="nav-link" data-page="index">Dashboard</a>
+                <a href="markets.html"     class="nav-link" data-page="markets">Top Markets</a>
+                <a href="methodology.html" class="nav-link" data-page="methodology">Methodology</a>
+                <a href="about.html"       class="nav-link" data-page="about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard">
+            <!-- Header Section -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <h1 class="page-title">Poly-EPU Index Dashboard</h1>
+                    <p class="page-subtitle">Economic Policy Uncertainty derived from Polymarket prediction data</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statLatestEPU">--</div>
+                        <div class="stat-label">Latest EPU Value</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotalMarkets">--</div>
+                        <div class="stat-label">Markets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDateRange">--</div>
+                        <div class="stat-label">Data Coverage</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statVolume">--</div>
+                        <div class="stat-label">Total Volume</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2 class="section-title">Poly-EPU Trend</h2>
+
+                    <div class="chart-controls">
+                        <!-- Time Period Selector -->
+                        <div class="control-group">
+                            <label class="control-label">Period</label>
+                            <div class="btn-group" id="periodSelector">
+                                <button class="btn-period active" data-period="daily">Day</button>
+                                <button class="btn-period" data-period="weekly">Week</button>
+                                <button class="btn-period" data-period="monthly">Month</button>
+                            </div>
+                        </div>
+
+                        <!-- Date Range Picker (split start / end) -->
+                        <div class="control-group">
+                            <label class="control-label">Date Range</label>
+                            <div class="date-inputs-split">
+                                <input type="text" id="startDatePicker" class="date-split-input"
+                                       placeholder="Start date" readonly>
+                                <span class="date-split-sep">to</span>
+                                <input type="text" id="endDatePicker" class="date-split-input"
+                                       placeholder="End date" readonly>
+                            </div>
+                            <button class="date-reset-btn" onclick="resetDateRange()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-nav-wrapper">
+                        <button type="button" class="chart-nav-btn chart-nav-left" id="chartNavLeft" aria-label="View earlier period">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6"/>
+                            </svg>
+                        </button>
+                        <div class="chart-inner">
+                            <div id="epuChart"></div>
+                        </div>
+                        <button type="button" class="chart-nav-btn chart-nav-right" id="chartNavRight" aria-label="View later period">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chart Legend -->
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: var(--accent-blue);"></span>
+                        <span class="legend-label">Poly-EPU Index</span>
+                    </div>
+                    <div class="legend-info">
+                        <span>Higher values indicate greater economic policy uncertainty</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats Table -->
+            <div class="quick-stats-section">
+                <h2 class="section-title">Recent EPU Values</h2>
+                <div class="table-container">
+                    <table id="recentDataTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>EPU Value</th>
+                                <th>Markets</th>
+                                <th>Total Volume</th>
+                                <th>Change</th>
+                                <th>Top Markets</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentDataBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-info">
+                <p>Poly-EPU Index - Economic Policy Uncertainty from Prediction Markets</p>
+                <p class="footer-meta">Data source: <a href="https://polymarket.com" target="_blank">Polymarket</a></p>
+            </div>
+            <div class="footer-links">
+                <a href="methodology.html">Methodology</a>
+                <a href="about.html">About This Research</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+    <script>
+    // ── Active nav highlight ───────────────────────────────────────────────
+    (function () {
+        const path = window.location.pathname;
+        const page = path.includes('markets') ? 'markets'
+                   : path.includes('methodology') ? 'methodology'
+                   : path.includes('about') ? 'about'
+                   : 'index';
+        document.querySelectorAll('.nav-link').forEach(a => {
+            if (a.dataset.page === page) a.classList.add('active');
+        });
+    })();
+
+    // ── Constants ──────────────────────────────────────────────────────────
+    const DATA_START = '2024-01-01';
+    const DATA_END   = '2025-06-19';
+
+    let epuChart      = null;
+    let currentPeriod = 'daily';
+    let activeStart   = DATA_START;
+    let activeEnd     = DATA_END;
+    let startPicker   = null;
+    let endPicker     = null;
+    // Chart x-axis range for left/right navigation
+    let chartDataMin  = null;
+    let chartDataMax  = null;
+    let viewMin       = null;
+    let viewMax       = null;
+
+    // ── CSV cache (loaded once) ────────────────────────────────────────────
+    // _allDailyData: [{date:'2024-01-01', index_value, num_markets, total_volume}]
+    let _allDailyData = null;
+
+    // ── Boot ───────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        initDateRangePicker();
+        initEPUChart();
+        setupEventListeners();
+        loadCSV();  // fetch CSV, then populate chart + table
+    });
+
+    // ── CSV loading & parsing ──────────────────────────────────────────────
+    function loadCSV() {
+        fetch('Poly_EPU.csv')
+            .then(r => r.text())
+            .then(text => {
+                const result = Papa.parse(text, {
+                    header: true,
+                    skipEmptyLines: true
+                });
+                _allDailyData = buildDailyData(result.data);
+                refreshView();
+            })
+            .catch(err => console.error('Failed to load Poly_EPU.csv:', err));
+    }
+
+    /**
+     * Aggregate raw CSV rows into one object per calendar date.
+     * CSV date format: "2024/1/1 8:00" or "2024/6/13 8:00"
+     */
+    function buildDailyData(rows) {
+        const byDate = {};
+        rows.forEach(row => {
+            const raw = (row['date'] || '').trim();
+            if (!raw) return;
+            // Take the date part before the space, then normalise to YYYY-MM-DD
+            const datePart = raw.split(' ')[0]; // "2024/1/1"
+            const [y, m, d] = datePart.split('/');
+            if (!y || !m || !d) return;
+            const dateKey = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+            const val  = parseFloat(row['index_value']);
+            const vol  = parseFloat(row['total_volume'] || 0) || 0;
+            const mkts = parseInt(row['num_markets'] || 0, 10) || 0;
+            if (isNaN(val)) return;
+
+            if (!byDate[dateKey]) {
+                byDate[dateKey] = { vals: [], vol: 0, mkts: 0 };
+            }
+            byDate[dateKey].vals.push(val);
+            byDate[dateKey].vol  += vol;
+            byDate[dateKey].mkts  = Math.max(byDate[dateKey].mkts, mkts);
+        });
+
+        return Object.keys(byDate).sort().map(dateKey => ({
+            date:         dateKey,
+            index_value:  byDate[dateKey].vals.reduce((a,b) => a+b, 0) / byDate[dateKey].vals.length,
+            num_markets:  byDate[dateKey].mkts,
+            total_volume: byDate[dateKey].vol
+        }));
+    }
+
+    // ── Aggregate daily → weekly or monthly ───────────────────────────────
+    function getWeekStart(dateStr) {
+        const d   = new Date(dateStr + 'T00:00:00');
+        const day = d.getDay() || 7; // Mon=1 … Sun=7
+        const monday = new Date(d);
+        monday.setDate(d.getDate() - day + 1);
+        const y  = monday.getFullYear();
+        const m  = String(monday.getMonth() + 1).padStart(2,'0');
+        const dd = String(monday.getDate()).padStart(2,'0');
+        return `${y}-${m}-${dd}`;
+    }
+
+    function aggregatePeriods(dailyData, mode) {
+        const buckets = {};
+        dailyData.forEach(item => {
+            let key;
+            if (mode === 'weekly') {
+                key = getWeekStart(item.date);
+            } else {
+                key = item.date.substring(0, 7); // YYYY-MM
+            }
+            if (!buckets[key]) buckets[key] = [];
+            buckets[key].push(item);
+        });
+
+        return Object.keys(buckets).sort().map(key => {
+            const items   = buckets[key];
+            const avgVal  = items.reduce((s,i) => s + i.index_value, 0) / items.length;
+            const totVol  = items.reduce((s,i) => s + i.total_volume, 0);
+            const maxMkts = Math.max(...items.map(i => i.num_markets));
+            return {
+                date:         items[0].date,  // first day of bucket
+                index_value:  avgVal,
+                num_markets:  maxMkts,
+                total_volume: totVol
+            };
+        });
+    }
+
+    // ── Filter + aggregate, then push to chart & table ────────────────────
+    function refreshView() {
+        if (!_allDailyData) return;
+
+        let data = _allDailyData.filter(d => d.date >= activeStart && d.date <= activeEnd);
+
+        if (currentPeriod === 'weekly') {
+            data = aggregatePeriods(data, 'weekly');
+        } else if (currentPeriod === 'monthly') {
+            data = aggregatePeriods(data, 'monthly');
+        }
+
+        updateChart(data);
+        updateRecentTable(data);
+        updateStatCardsFromData(data);
+    }
+
+    // ── Flatpickr split date pickers (start + end) ────────────────────────
+    function initDateRangePicker() {
+        const sharedConfig = {
+            dateFormat: 'Y-m-d',
+            minDate:    DATA_START,
+            maxDate:    DATA_END,
+            disableMobile: true
+        };
+
+        startPicker = flatpickr('#startDatePicker', Object.assign({}, sharedConfig, {
+            defaultDate: DATA_START,
+            onChange: function (selectedDates, dateStr) {
+                if (!dateStr) return;
+                activeStart = dateStr;
+                endPicker.set('minDate', dateStr);
+                if (activeEnd < dateStr) {
+                    activeEnd = dateStr;
+                    endPicker.setDate(dateStr, false);
+                }
+                refreshView();
+            }
+        }));
+
+        endPicker = flatpickr('#endDatePicker', Object.assign({}, sharedConfig, {
+            defaultDate: DATA_END,
+            onChange: function (selectedDates, dateStr) {
+                if (!dateStr) return;
+                activeEnd = dateStr;
+                startPicker.set('maxDate', dateStr);
+                if (activeStart > dateStr) {
+                    activeStart = dateStr;
+                    startPicker.setDate(dateStr, false);
+                }
+                refreshView();
+            }
+        }));
+    }
+
+    function resetDateRange() {
+        activeStart = DATA_START;
+        activeEnd   = DATA_END;
+        startPicker.set('maxDate', DATA_END);
+        endPicker.set('minDate', DATA_START);
+        startPicker.setDate(DATA_START, false);
+        endPicker.setDate(DATA_END, false);
+        refreshView();
+    }
+
+    // ── ApexCharts ─────────────────────────────────────────────────────────
+    function initEPUChart() {
+        const options = {
+            series: [{ name: 'Poly-EPU', data: [] }],
+            chart: {
+                type: 'area',
+                height: 450,
+                background: 'transparent',
+                foreColor: '#a0a0a0',
+                toolbar: {
+                    show: true,
+                    autoSelected: 'zoom',
+                    tools: {
+                        download: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+                        selection: false,
+                        zoom: true,
+                        zoomin: false,
+                        zoomout: false,
+                        pan: false,
+                        reset: false
+                    }
+                },
+                zoom: { enabled: true, type: 'x', autoScaleYAxis: true },
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800,
+                    dynamicAnimation: { enabled: true, speed: 600 }
+                },
+                events: {
+                    zoomed: function (chartCtx, { xaxis }) {
+                        if (xaxis && xaxis.min != null && xaxis.max != null) {
+                            viewMin = xaxis.min;
+                            viewMax = xaxis.max;
+                        }
+                        updateNavBtnVisibility();
+                    },
+                    beforeResetZoom: function () {
+                        viewMin = chartDataMin;
+                        viewMax = chartDataMax;
+                        setTimeout(updateNavBtnVisibility, 50);
+                    }
+                }
+            },
+            colors: ['#00d4ff'],
+            fill: {
+                type: 'gradient',
+                gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05, stops: [0, 100] }
+            },
+            stroke: { curve: 'smooth', width: 2 },
+            dataLabels: { enabled: false },
+            xaxis: {
+                type: 'datetime',
+                labels: {
+                    style: { colors: '#a0a0a0' },
+                    datetimeFormatter: { year: 'yyyy', month: "MMM 'yy", day: 'dd MMM', hour: 'HH:mm' }
+                },
+                axisBorder: { color: '#2a2a4a' },
+                axisTicks:  { color: '#2a2a4a' }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: '#a0a0a0' },
+                    formatter: val => val.toFixed(3)
+                },
+                title: { text: 'EPU Index Value', style: { color: '#a0a0a0' } }
+            },
+            grid: { borderColor: '#2a2a4a', strokeDashArray: 3 },
+            tooltip: {
+                theme: 'dark',
+                x: { format: 'dd MMM yyyy' },
+                custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                    const data = w.config.series[seriesIndex].data[dataPointIndex];
+                    const date = new Date(data.x).toLocaleDateString('en-US',
+                        { year: 'numeric', month: 'short', day: 'numeric' });
+                    let html = `<div class="custom-tooltip">
+                        <div class="tooltip-header">${date}</div>
+                        <div class="tooltip-body">
+                            <div class="tooltip-row">
+                                <span class="tooltip-label">EPU Value:</span>
+                                <span class="tooltip-value">${data.y.toFixed(4)}</span>
+                            </div>`;
+                    if (data.num_markets !== undefined)
+                        html += `<div class="tooltip-row">
+                            <span class="tooltip-label">Markets:</span>
+                            <span class="tooltip-value">${data.num_markets}</span>
+                        </div>`;
+                    if (data.total_volume !== undefined)
+                        html += `<div class="tooltip-row">
+                            <span class="tooltip-label">Volume:</span>
+                            <span class="tooltip-value">$${formatNumber(data.total_volume)}</span>
+                        </div>`;
+                    html += `</div></div>`;
+                    return html;
+                }
+            },
+            markers: { size: 0, hover: { size: 6 } }
+        };
+
+        epuChart = new ApexCharts(document.querySelector('#epuChart'), options);
+        epuChart.render();
+        setupChartNavButtons();
+    }
+
+    function setupChartNavButtons() {
+        document.getElementById('chartNavLeft').addEventListener('click', () => shiftChartView(-1));
+        document.getElementById('chartNavRight').addEventListener('click', () => shiftChartView(1));
+    }
+
+    function shiftChartView(direction) {
+        if (!epuChart || chartDataMin == null || chartDataMax == null) return;
+        const g = epuChart.w && epuChart.w.globals;
+        if (g && g.minX != null && g.maxX != null) {
+            viewMin = g.minX;
+            viewMax = g.maxX;
+        }
+        if (viewMin == null) viewMin = chartDataMin;
+        if (viewMax == null) viewMax = chartDataMax;
+
+        const range = viewMax - viewMin;
+        const step  = Math.max(range * 0.25, 30 * 24 * 60 * 60 * 1000);
+        let newMin  = viewMin + direction * step;
+        let newMax  = viewMax + direction * step;
+
+        if (newMin < chartDataMin) { newMin = chartDataMin; newMax = Math.min(chartDataMax, chartDataMin + range); }
+        if (newMax > chartDataMax) { newMax = chartDataMax; newMin = Math.max(chartDataMin, chartDataMax - range); }
+
+        viewMin = newMin;
+        viewMax = newMax;
+        epuChart.updateOptions({ xaxis: { min: viewMin, max: viewMax } });
+        updateNavBtnVisibility();
+    }
+
+    function updateNavBtnVisibility() {
+        const tolerance = 24 * 60 * 60 * 1000;
+        const isFullRange =
+            chartDataMin != null && chartDataMax != null &&
+            Math.abs((viewMin ?? chartDataMin) - chartDataMin) < tolerance &&
+            Math.abs((viewMax ?? chartDataMax) - chartDataMax) < tolerance;
+
+        const leftBtn  = document.getElementById('chartNavLeft');
+        const rightBtn = document.getElementById('chartNavRight');
+        if (isFullRange) {
+            leftBtn.classList.remove('visible');
+            rightBtn.classList.remove('visible');
+        } else {
+            leftBtn.classList.add('visible');
+            rightBtn.classList.add('visible');
+        }
+    }
+
+    // ── Chart update ───────────────────────────────────────────────────────
+    function updateChart(data) {
+        const chartData = data.map(item => ({
+            x:            new Date(item.date + 'T00:00:00').getTime(),
+            y:            item.index_value,
+            num_markets:  item.num_markets,
+            total_volume: item.total_volume
+        }));
+
+        epuChart.updateSeries([{ name: 'Poly-EPU', data: chartData }], true);
+
+        if (chartData.length > 0) {
+            chartDataMin = chartData[0].x;
+            chartDataMax = chartData[chartData.length - 1].x;
+            viewMin = chartDataMin;
+            viewMax = chartDataMax;
+            epuChart.updateOptions({ xaxis: { min: chartDataMin, max: chartDataMax } });
+        }
+        updateNavBtnVisibility();
+    }
+
+    // ── Stat cards ─────────────────────────────────────────────────────────
+    function updateStatCardsFromData(data) {
+        if (!data || data.length === 0) return;
+        const latest = data[data.length - 1];
+        document.getElementById('statLatestEPU').textContent = latest.index_value.toFixed(4);
+
+        const start = formatShortDate(data[0].date);
+        const end   = formatShortDate(data[data.length - 1].date);
+        document.getElementById('statDateRange').textContent = `${start} – ${end}`;
+
+        const maxMkts = Math.max(...data.map(d => d.num_markets || 0));
+        document.getElementById('statTotalMarkets').textContent = maxMkts;
+
+        const totalVol = data.reduce((s, d) => s + (d.total_volume || 0), 0);
+        document.getElementById('statVolume').textContent = '$' + formatNumber(totalVol);
+    }
+
+    // ── Recent table ───────────────────────────────────────────────────────
+    function updateRecentTable(data) {
+        const tbody      = document.getElementById('recentDataBody');
+        const recentData = data.slice(-10).reverse();
+
+        let html = '';
+        for (let i = 0; i < recentData.length; i++) {
+            const item     = recentData[i];
+            const prevItem = recentData[i + 1];
+            let changeClass = '', changeText = '--';
+
+            if (prevItem) {
+                const change = (item.index_value - prevItem.index_value) / prevItem.index_value * 100;
+                changeClass = change >= 0 ? 'positive' : 'negative';
+                changeText  = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+            }
+
+            html += `
+                <tr>
+                    <td>${formatDate(item.date)}</td>
+                    <td><span class="value-highlight">${item.index_value.toFixed(4)}</span></td>
+                    <td>${item.num_markets || '--'}</td>
+                    <td>$${formatNumber(item.total_volume || 0)}</td>
+                    <td class="change ${changeClass}">${changeText}</td>
+                    <td><a class="top-markets-link" href="markets.html?date=${item.date}" title="View Top markets for ${item.date}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </a></td>
+                </tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+
+    // ── Event listeners ────────────────────────────────────────────────────
+    function setupEventListeners() {
+        document.querySelectorAll('.btn-period').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.btn-period').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentPeriod = this.dataset.period;
+                refreshView();
+            });
+        });
+    }
+
+    // ── Utilities ──────────────────────────────────────────────────────────
+    function formatNumber(num) {
+        if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+        if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+        if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+        return num.toFixed(2);
+    }
+
+    function formatDate(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function formatShortDate(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    }
+    </script>
+</body>
+</html>
