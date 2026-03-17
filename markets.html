@@ -289,8 +289,9 @@
     })();
 
     // ── Constants ──────────────────────────────────────────────────────────
-    const MARKET_DATA_START = '2022-11-18';
-    const MARKET_DATA_END   = '2025-06-19';
+    // Keep consistent with the dashboard's supported window
+    const MARKET_DATA_START = '2024-02-01';
+    const MARKET_DATA_END   = '2025-06-13';
 
     // Loaded once from markets_cache.json: { daily: { "YYYY-MM-DD": {...} } }
     let _marketsCache = null;
@@ -340,7 +341,10 @@
             .then(r => r.json())
             .then(data => {
                 _marketsCache = data.daily || {};
-                _marketsDates = Object.keys(_marketsCache).sort();
+                // Only allow dates within the supported window
+                _marketsDates = Object.keys(_marketsCache)
+                    .filter(d => d >= MARKET_DATA_START && d <= MARKET_DATA_END)
+                    .sort();
                 loadTopMarkets();
             })
             .catch(err => {
