@@ -141,9 +141,14 @@
     .chart-nav-btn:focus { outline: none; }
     .chart-nav-left  { border-radius: 8px 0 0 8px; border-right-width: 0; }
     .chart-nav-right { border-radius: 0 8px 8px 0; border-left-width:  0; }
-    .chart-inner { flex: 1; min-width: 0; }
+.chart-inner {
+    flex: 1;
+    min-width: 0;
+    transition: opacity 0.45s ease;
+}
+.chart-inner.chart-reset-dim { opacity: 0.38; }
 
-    /* ── ApexCharts toolbar ─────────────────────────────────────── */
+/* ── ApexCharts toolbar ─────────────────────────────────────── */
     .apexcharts-toolbar { gap: 10px !important; }
     .apexcharts-toolbar > div { margin: 0 !important; }
     .apexcharts-zoom-icon,
@@ -485,7 +490,10 @@
 
     // ── Filter + aggregate, then push to chart & table ────────────────────
     function refreshView() {
-        if (!_allDailyData) return;
+        if (!_allDailyData) {
+            document.querySelector('.chart-inner')?.classList.remove('chart-reset-dim');
+            return;
+        }
 
         let data = _allDailyData.filter(d => d.date >= activeStart && d.date <= activeEnd);
 
@@ -539,13 +547,26 @@
     }
 
     function resetDateRange() {
+        currentPeriod = 'daily';
+        document.querySelectorAll('.btn-period').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.period === 'daily');
+        });
+
         activeStart = DATA_START;
         activeEnd   = DATA_END;
+
+        startPicker.set('minDate', DATA_START);
         startPicker.set('maxDate', DATA_END);
         endPicker.set('minDate', DATA_START);
+        endPicker.set('maxDate', DATA_END);
+
         startPicker.setDate(DATA_START, false);
         endPicker.setDate(DATA_END, false);
-        refreshView();
+
+        const inner = document.querySelector('.chart-inner');
+        if (inner) inner.classList.add('chart-reset-dim');
+
+        setTimeout(() => refreshView(), 160);
     }
 
     // ── ApexCharts ─────────────────────────────────────────────────────────
@@ -701,7 +722,7 @@
 
     // ── Chart update ───────────────────────────────────────────────────────
     function updateChart(data) {
-        const chartData = data.map(item => ({
+        const chartData = (data || []).map(item => ({
             x:            new Date(item.date + 'T00:00:00').getTime(),
             y:            item.index_value,
             num_markets:  item.num_markets,
@@ -717,6 +738,14 @@
             viewMax = chartDataMax;
             epuChart.updateOptions({ xaxis: { min: chartDataMin, max: chartDataMax } });
         }
+
+        const inner = document.querySelector('.chart-inner');
+        if (inner && inner.classList.contains('chart-reset-dim')) {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => inner.classList.remove('chart-reset-dim'));
+            });
+        }
+
         updateNavBtnVisibility();
     }
 
