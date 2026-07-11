@@ -415,7 +415,7 @@
 
     /**
      * Aggregate raw CSV rows into one object per calendar date.
-     * CSV date format: "2024/1/1 8:00" or "2024/6/13 8:00"
+     * CSV date format: ISO "2022-11-18 08:00:24" or legacy "2024/1/1 8:00".
      */
     function buildDailyData(rows) {
         const byDate = {};
@@ -423,8 +423,13 @@
             const raw = (row['date'] || '').trim();
             if (!raw) return;
             // Take the date part before the space, then normalise to YYYY-MM-DD
-            const datePart = raw.split(' ')[0]; // "2024/1/1"
-            const [y, m, d] = datePart.split('/');
+            const datePart = raw.split(' ')[0]; // "2022-11-18" or "2024/1/1"
+            let y, m, d;
+            if (datePart.includes('-')) {
+                [y, m, d] = datePart.split('-');           // ISO format
+            } else {
+                [y, m, d] = datePart.split('/');           // legacy slash format
+            }
             if (!y || !m || !d) return;
             const dateKey = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 
